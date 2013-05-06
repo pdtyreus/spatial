@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="generator" content="AsciiDoc 8.6.8">
+<title>Neo4j Spatial v-neo4j-version</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install(2);
+/*]]>*/
+</script>
+
+<!-- favicon -->
+
+<link rel="shortcut icon" href="http://neo4j.org/favicon.ico" type="image/vnd.microsoft.icon" />
+<link rel="icon" href="http://neo4j.org/favicon.ico" type="image/x-icon" />
+
+<!-- style -->
+
+<link href="css/shCore.css" rel="stylesheet" type="text/css" />
+<link href="css/shCoreEclipse.css" rel="stylesheet" type="text/css" />
+<link href="css/shThemeEclipse.css" rel="stylesheet" type="text/css" />
+<link href="css/neo.css" rel="stylesheet" type="text/css" />
+<link href="css/neo-asciidoc.css" rel="stylesheet" type="text/css" />
+
+<!-- Syntax Highlighter -->
+
+<script type="text/javascript" src="js/shCore.js"></script>
+<script type="text/javascript" src="js/shBrushJava.js"></script>
+<script type="text/javascript" src="js/shBrushJScript.js"></script>
+<script type="text/javascript" src="js/shBrushBash.js"></script>
+<script type="text/javascript" src="js/shBrushPlain.js"></script>
+<script type="text/javascript" src="js/shBrushXml.js"></script>
+<script type="text/javascript" src="js/shBrushGroovy.js"></script>
+<script type="text/javascript" src="js/shBrushCypher.js"></script>
+<script type="text/javascript" src="js/shBrushScala.js"></script>
+<script type="text/javascript" src="js/shBrushSql.js"></script>
+<script type="text/javascript" src="js/shBrushPython.js"></script>
+<script type="text/javascript" src="js/shBrushProperties.js"></script>
+
+<!-- activate when needed
+<script type="text/javascript" src="js/shBrushRuby.js"></script>
+<script type="text/javascript" src="js/shBrushCSharp.js"></script>
+-->
+
+<script type="text/javascript">
+  SyntaxHighlighter.defaults['tab-size'] = 4;
+  SyntaxHighlighter.defaults['gutter'] = false;
+  SyntaxHighlighter.defaults['toolbar'] = false;
+  SyntaxHighlighter.all()
+</script>
+
+<!-- JQuery -->
+
+<script type="text/javascript" src="js/jquery-1.6.4.min.js"></script>
+
+<!-- Replace SVG for browsers that lack support. -->
+<script type="text/javascript" src="js/svgreplacer.js"></script>
+
+<!-- Image Scaler -->
+
+<script type="text/javascript" src="js/imagescaler.js"></script>
+
+<!-- Table Styler -->
+
+<script type="text/javascript" src="js/tablestyler.js"></script>
+
+<!-- Cypher Console -->
+
+<script type="text/javascript" src="js/cypherconsole.js"></script>
+
+<!-- Version -->
+
+<script type="text/javascript" src="js/version.js"></script>
+
+
+</head>
+<body class="book">
+<div id="header">
+<h1>Neo4j Spatial v-neo4j-version</h1>
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="spatial-introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Neo4j Spatial is a library of utilities for Neo4j that facilitate the enabling of spatial operations on data.
+In particular you can add spatial indexes to already located data, and perform spatial operations on the data like searching for data within specified regions or within a specified distance of a point of interest.
+In addition classes are provided to expose the data to GeoTools and thereby to GeoTools-enabled applications like GeoServer and uDig.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/one-street.png" alt="one-street.png">
+</div>
+</div>
+<div class="paragraph"><p>The key features include:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Utilities for importing from ESRI Shapefile as well as Open Street Map files
+</p>
+</li>
+<li>
+<p>
+Support for all the common geometry types: Point, LineString, Polygon, etc.
+</p>
+</li>
+<li>
+<p>
+An RTree index for fast searches on geometries
+</p>
+</li>
+<li>
+<p>
+Support for topology operations during the search (contains, within, intersects, covers, disjoint, etc.)
+</p>
+</li>
+<li>
+<p>
+The possibility to enable spatial operations on any graph of data, regardless of the way the spatial data is stored, as long as an adapter is provided to map from the graph to the geometries.
+</p>
+</li>
+<li>
+<p>
+Ability to split a single layer or dataset into multiple sub-layers or views with pre-configured filters
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spatial-indexing">Index and Querying</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The current index is an RTree index, but it has been developed in an extensible way allowing for other indices to be added if necessary.</p></div>
+<div class="sect2">
+<h3 id="spatial-loading-and-indexing">Loading and Indexing</h3>
+<div class="paragraph"><p>It is possible to load data into the database and add it to the index during the load.
+It is also possible to add existing spatial data to the index later. These are two very different
+scenarios, and in fact can lead to different graph structures, so we will explain them each in turn.</p></div>
+<div class="paragraph"><p>To load data directly into the index, the simplest approach is to start by creating a Layer that
+suites your data. There are many possible choices built into Neo4j-Spatial, but two common ones
+would be:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+SimplePointLayer - an editable layer that allows you to add only Points to the database.
+This is a good choice if you only have point data and are interested primarily in proximity
+searches. This layer includes utility methods specifically for that case.
+</p>
+</li>
+<li>
+<p>
+EdiableLayerImpl - this is the default editable layer implementation and can handle any
+type of simple geometry, including Point, LineString and Polygon, as well as Multi-Point,
+Multi-LineString and Multi-Polygon. Since it is a generic implementation and cannot know about
+the topology of your data model, it stores each geometry separately in a single property of a
+single node. The storage format is WKB, or <em>Well Known Binary</em>, which is a binary format specific
+to geographic geometries, and also used by the popular open source spatial database PostGIS.
+</p>
+</li>
+</ul></div>
+<div class="sect3">
+<h4 id="_simple_point_layer">Simple Point Layer</h4>
+<div class="paragraph"><p>simple point layer</p></div>
+</div>
+<div class="sect3">
+<h4 id="_editablelayer">EditableLayer</h4>
+<div class="paragraph"><p>editable layer</p></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="spatial-querying">Querying</h3>
+<div class="sect3">
+<h4 id="_jts_queries">JTS Queries</h4>
+<div class="paragraph"><p>Neo4j-Spatial contains the <em>Java Topology Suite</em>, a library of geometries and geometry operations. In fact, whenever we use the term <em>Geometry</em> we are refering to the JTS class Geometry. Likewise the subclasses of Geometry: Point, LineString, Polygon and others are all from JTS.
+This means that you can use all the capabilities of JTS to operate on Geometry instances you obtain from the database. If, for example, you perform a search for geometries in a certain area, you will be able to
+iterate over the results and for each geometry returned, call JTS methods on that class. For example, you could call geometry.</p></div>
+<div class="paragraph"><p>But
+The spatial queries implemented are:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Contain
+</p>
+</li>
+<li>
+<p>
+Cover
+</p>
+</li>
+<li>
+<p>
+Covered By
+</p>
+</li>
+<li>
+<p>
+Cross
+</p>
+</li>
+<li>
+<p>
+Disjoint
+</p>
+</li>
+<li>
+<p>
+Intersect
+</p>
+</li>
+<li>
+<p>
+Intersect Window
+</p>
+</li>
+<li>
+<p>
+Overlap
+</p>
+</li>
+<li>
+<p>
+Touch
+</p>
+</li>
+<li>
+<p>
+Within
+</p>
+</li>
+<li>
+<p>
+Within Distance
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect3">
+<h4 id="_cql_queries">CQL Queries</h4>
+<div class="paragraph"><p>TBD</p></div>
+</div>
+<div class="sect3">
+<h4 id="_json_queries">JSON Queries</h4>
+<div class="paragraph"><p>TDB</p></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spatial-layers">Layers and GeometryEncoders</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The primary type that defines a collection of geometries is the <span class="monospaced">Layer</span>.
+A layer contains an index for querying.
+In addition a <span class="monospaced">Layer</span> can be an <span class="monospaced">EditableLayer</span> if it is possible to add and modify geometries in the layer.
+The next most important interface is the GeometryEncoder.</p></div>
+<div class="paragraph"><p>The <span class="monospaced">DefaultLayer</span> is the standard layer, making use of the <span class="monospaced">WKBGeometryEncoder</span> for storing all geometry types as <span class="monospaced">byte[]</span> properties of one node per geometry instance.</p></div>
+<div class="paragraph"><p>The <span class="monospaced">OSMLayer</span> is a special layer supporting Open Street Map and storing the OSM model as a single fully connected graph.
+The set of <span class="monospaced">Geometries</span> provided by this layer includes <span class="monospaced">Points</span>, <span class="monospaced">LineStrings</span> and <span class="monospaced">Polygons</span>, and as such cannot be exported to Shapefile format, since that format only allows a single <span class="monospaced">Geometry</span> per layer.
+However, <span class="monospaced">OMSLayer</span> extends <span class="monospaced">DynamicLayer</span>, which allow it to provide any number of sub-layers, each with a specific geometry type and in addition based on a OSM tag filter.
+For example you can have a layer providing all cycle paths as <span class="monospaced">LineStrings</span>, or a layer providing all lakes as <span class="monospaced">Polygons</span>.
+Underneath these are all still backed by the same fully connected graph, but exposed dynamically as apparently separate geometry layers.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spatial-geoserver">Neo4j Spatial Geoserver Plugin</h2>
+<div class="sectionbody">
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Important</div>
+</td>
+<td class="content">Tested with: GeoServer 2.1.1</td>
+</tr></table>
+</div>
+<div class="sect2">
+<h3 id="spatial-geoserver-building">Building</h3>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>mvn clean install</pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="spatial-geoserver-deployment">Deployment into Geoserver</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+unzip the <span class="monospaced">target/xxxx-server-plugin.zip</span> into $GEOSERVER_HOME/webapps/geoserver/WEB-INF/lib
+</p>
+</li>
+<li>
+<p>
+restart geoserver
+</p>
+</li>
+<li>
+<p>
+configure a new workspace
+</p>
+</li>
+<li>
+<p>
+configure a new datasource neo4j in your workspace. Point the "The directory path of the Neo4j database:" parameter to the relative (form the GeoServer working dir) or aboslute path to a Neo4j Spatial database with layers (see <a href="https://github.com/neo4j/spatial">Neo4j Spatial</a>)
+</p>
+</li>
+<li>
+<p>
+in Layers, do "Add new resource" and choose your Neo4j datastore to see the exisitng Neo4j Spatial layers and add them.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="spatial-geoserver-trunk">Testing in GeoServer trunk</h3>
+<div class="ulist"><ul>
+<li>
+<p>
+check out the geoserver source
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>svn co https://svn.codehaus.org/geoserver/trunk geoserver-trunk</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+build the source
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>cd geoserver-trunk
+mvn clean install</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+check that you can run the web app as of <a href="http://docs.geoserver.org/latest/en/developer/maven-guide/index.html#running-the-web-module-with-jetty">The GeoServer Maven build guide</a>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>cd src/web/app
+mvn jetty:run</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+in $GEOSERVER_SOURCE/src/web/app/pom.xml (<a href="https://svn.codehaus.org/geoserver/trunk/src/web/app/pom.xml">https://svn.codehaus.org/geoserver/trunk/src/web/app/pom.xml</a>), add the following lines under the profiles section:
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>    &lt;profile&gt;
+      &lt;id&gt;neo4j&lt;/id&gt;
+      &lt;dependencies&gt;
+        &lt;dependency&gt;
+          &lt;groupId&gt;org.neo4j&lt;/groupId&gt;
+          &lt;artifactId&gt;neo4j-spatial&lt;/artifactId&gt;
+          &lt;version&gt;0.7-SNAPSHOT&lt;/version&gt;
+        &lt;/dependency&gt;
+      &lt;/dependencies&gt;
+    &lt;/profile&gt;</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+start the GeoServer webapp again with the added neo4j profile
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content monospaced">
+<pre>cd $GEOSERVER_SRC/src/web/app
+mvn jetty:run -Pneo4j</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+find Neo4j installed as a datasource under <a href="http://localhost:8080">http://localhost:8080</a>
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>For more info head over to <a href="http://wiki.neo4j.org/content/Neo4j_Spatial_in_GeoServer">Neo4j Wiki on Geoserver</a></p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spatial-examples">Examples</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="spatial-import-shapefile">Importing a shapefile</h3>
+<div class="paragraph"><p>Neo4j-Spatial includes a utility for importing ESRI Shapefile data. The ShapefileImporter will create a new Layer for each Shapefile imported, and will store each Geometry as WKB in a single property of a single node. All attributes of the Feature will be stored as additional properties of that node. For more information on how this is implemented, you can refer to the classes WKBGeometryEncoder. However, you do not need to know any of that to use this feature. Consider the simple code below.</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GraphDatabaseService database = new EmbeddedGraphDatabase(databasePath);
+try {
+    ShapefileImporter importer = new ShapefileImporter(database);
+    importer.importFile("shp/highway.shp", "highway", Charset.forName("UTF-8"));
+} finally {
+    database.shutdown();
+}</pre>
+</div></div>
+<div class="paragraph"><p>This code will import the layer <em>highway</em> from the file <em>shp/highway.shp</em> which is included in the source distribution. This layer will be indexed using an RTree and can therefore be queried using any of the supported spatial operations. See the example on querying layers below.</p></div>
+</div>
+<div class="sect2">
+<h3 id="spatial-import-osm">Importing an Open Street Map file</h3>
+<div class="paragraph"><p>This is more complex because the current OSMImporter class runs in two phases, the first requiring a batch-inserter on the database.
+The is ongoing work to allow for a non-batch-inserter on the entire process, and possibly when you have read this that will already be available.
+Refer to the unit tests in classes <span class="monospaced">TestDynamicLayers</span> and <span class="monospaced">TestOSMImport</span> for the latest code for importing OSM data. For example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">OSMImporter importer = new OSMImporter("map.osm");
+importer.setCharset(Charset.forName("UTF-8"));
+BatchInserter batchInserter = new BatchInserterImpl(databasePath);
+importer.importFile(batchInserter, "map.osm", false);
+batchInserter.shutdown();
+
+GraphDatabaseService db = new EmbeddedGraphDatabase(databasePath);
+importer.reIndex(db);
+db.shutdown();</pre>
+</div></div>
+<div class="paragraph"><p>This code will import the map.osm Open Street Map file, populating the database with a little over 200 geometries, including streets, buildings and points of interest.</p></div>
+</div>
+<div class="sect2">
+<h3 id="spatial-spatial-query">Executing a spatial query</h3>
+<div class="paragraph"><p>Assuming you imported the map.osm file as in the previous example, you can now perform spatial searches on the data. The following example will search within a rectangle for a whatever geometries it can find:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GraphDatabaseService database = new EmbeddedGraphDatabase(databasePath);
+try {
+    SpatialDatabaseService spatialService = new SpatialDatabaseService(database);
+    Layer layer = spatialService.getLayer("map.osm");
+    LayerIndexReader spatialIndex = layer.getIndex();
+    System.out.println("Have " + spatialIndex.count() + " geometries in " + spatialIndex.getBoundingBox());
+
+    Envelope bbox = new Envelope(12.94, 12.96, 56.04, 56.06);
+    List&lt;SpatialDatabaseRecord&gt; results = GeoPipeline
+        .startIntersectWindowSearch(layer, bbox)
+        .toSpatialDatabaseRecordList();
+
+    doGeometryTestsOnResults(bbox, results);
+} finally {
+    database.shutdown();
+}</pre>
+</div></div>
+<div class="paragraph"><p>For more examples of query code, refer to the test code in the <span class="monospaced">LayerTest</span> and the <span class="monospaced">SpatialTest</span> classes.
+Also review the classes in the <span class="monospaced">org.neo4j.gis.spatial.query package</span> for the full range or search queries currently implemented.</p></div>
+</div>
+<div class="sect2">
+<h3 id="spatial-export-shapefile">Export a shapefile</h3>
+<div class="paragraph"><p>The ESRI Shapefile that we imported in the first example above was actually created by Neo4j-Spatial. It is possible to use the results of a query, or a DynamicLayer, to create a new Shapefile using the ShapefileExporter. If we were to export the complete layer created from importing a shapefile, we would not achieve much, but we can could use this capability to create shapefiles that are subsets of other layers, or that are created from data in another format.</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">SpatialDatabaseService spatialService = new SpatialDatabaseService(database);
+OSMLayer layer = (OSMLayer) spatialService.getLayer("map.osm");
+DynamicLayerConfig wayLayer = layer.addSimpleDynamicLayer(Constants.GTYPE_LINESTRING);
+ShapefileExporter shpExporter = new ShapefileExporter(database);
+shpExporter.exportLayer(wayLayer.getName());</pre>
+</div></div>
+<div class="paragraph"><p>This example shows how we can import an OSM dataset, which contains data with a number of different Geometry types, and then by using a DynamicLayer to select for only geometries of type <em>LineString</em>, we can export all the OSM ways to a Shapefile. This is particularly important when you consider that ESRI Shapefile format does not allow more than one Geometry type per shapefile.</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">SpatialDatabaseService spatialService = new SpatialDatabaseService(database);
+Layer layer = spatialService.getLayer("map.osm");
+LayerIndexReader spatialIndex = layer.getIndex();
+System.out.println("Have " + spatialIndex.count() + " geometries in " + spatialIndex.getBoundingBox());
+
+Envelope bbox = new Envelope(12.94, 12.96, 56.04, 56.06);
+List&lt;SpatialDatabaseRecord&gt; results = GeoPipeline
+    .startIntersectWindowSearch(layer, bbox)
+    .toSpatialDatabaseRecordList();
+
+spatialService.createResultsLayer("results", results);
+ShapefileExporter shpExporter = new ShapefileExporter(database);
+shpExporter.exportLayer("results");</pre>
+</div></div>
+<div class="paragraph"><p>This time we import the same OSM model, but query for all geometries inside a envelope, and export that to a new Shapefile.</p></div>
+</div>
+<div class="sect2">
+<h3 id="spatial-udig">Using Neo4j Spatial with uDig</h3>
+<div class="paragraph"><p>For more info head over to <a href="http://wiki.neo4j.org/content/Neo4j_Spatial_in_uDig">Neo4j Wiki on uDig</a></p></div>
+</div>
+<div class="sect2">
+<h3 id="spatial-geopipes">GeoPipes</h3>
+<div class="sect3">
+<h4 id="_base_layers">Base Layers</h4>
+<div class="paragraph"><p>These are the different base layers being used for the following examples:</p></div>
+<div class="paragraph"><p>OsmLayer:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/osmLayer.png" alt="osmLayer.png">
+</div>
+</div>
+<div class="paragraph"><p>IntersectionLayer:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/intersectionLayer.png" alt="intersectionLayer.png">
+</div>
+</div>
+<div class="paragraph"><p>LinesLayer:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/linesLayer.png" alt="linesLayer.png">
+</div>
+</div>
+<div class="paragraph"><p>BoxesLayer:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/boxesLayer.png" alt="boxesLayer.png">
+</div>
+</div>
+<div class="paragraph"><p>ConcaveLayer:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/concaveLayer.png" alt="concaveLayer.png">
+</div>
+</div>
+<div class="paragraph"><p>EqualLayer:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/equalLayer.png" alt="equalLayer.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="_geopipes_examples">GeoPipes Examples</h4>
+<div class="paragraph"><p>Below follows a non-exhaustive lists of interesting GeoPipes that can be chained together to contruct a
+geoprocessing system in while trying to keep the processing as lazy as possible using iterators through
+the different steps.</p></div>
+</div>
+<div class="sect3">
+<h4 id="examples-search-within-geometry">Search within geometry</h4>
+<div class="paragraph"><p>This pipe performs a search within a
+geometry in this example, both OSM street
+geometries should be found in when searching with
+an enclosing rectangle Envelope.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline
+.startWithinSearch(osmLayer, osmLayer.getGeometryFactory().toGeometry(new Envelope(10, 20, 50, 60)));</pre>
+</div></div>
+</div>
+<div class="sect3">
+<h4 id="examples-intersecting-windows">Intersecting windows</h4>
+<div class="paragraph"><p>The FilterIntersectWindow pipe finds geometries that intersects a given rectangle.
+This pipeline:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline
+    .start( boxesLayer )
+    .windowIntersectionFilter(new Envelope( 0, 10, 0, 10 ) );</pre>
+</div></div>
+<div class="paragraph"><p>will output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/intersecting_windows.png" alt="intersecting_windows.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-intersect-all">Intersect All</h4>
+<div class="paragraph"><p>The IntersectAll pipe intersects geometries of every item contained in the pipeline.
+It groups every item in the pipeline in a single item containing the geometry output
+of the intersection.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( intersectionLayer ).intersectAll();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/intersect_all.png" alt="intersect_all.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-unite-all">Unite All</h4>
+<div class="paragraph"><p>The Union All pipe unites geometries of every item contained in the pipeline.
+This pipe groups every item in the pipeline in a single item containing the geometry output
+of the union.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( intersectionLayer ).unionAll();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/unite_all.png" alt="unite_all.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-extract-points">Extract Points</h4>
+<div class="paragraph"><p>The Extract Points pipe extracts every point from a geometry.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( boxesLayer ).extractPoints();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/extract_points.png" alt="extract_points.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-filter-by-cql-using-complex-cql">Filter by cql using complex cql</h4>
+<div class="paragraph"><p>This filter will apply the
+provided CQL expression to the different geometries and only
+let the matching ones pass.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">long counter  = GeoPipeline.start( osmLayer ).cqlFilter(
+                "highway is not null and geometryType(the_geom) = 'LineString'" ).count();</pre>
+</div></div>
+</div>
+<div class="sect3">
+<h4 id="examples-boundary">Boundary</h4>
+<div class="paragraph"><p>The
+boundary pipe calculates boundary of every geometry in the pipeline.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( boxesLayer ).toBoundary();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/boundary.png" alt="boundary.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-centroid">Centroid</h4>
+<div class="paragraph"><p>The Centroid pipe calculates geometry centroid.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( boxesLayer ).toCentroid();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/centroid.png" alt="centroid.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-convex-hull">Convex Hull</h4>
+<div class="paragraph"><p>The ConvexHull pipe calculates geometry convex hull.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( concaveLayer ).toConvexHull();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/convex_hull.png" alt="convex_hull.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-densify">Densify</h4>
+<div class="paragraph"><p>The Densify pipe inserts extra vertices along the line segments in the geometry.
+The densified geometry contains no line segment which is longer than the given distance tolerance.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( concaveLayer ).densify( 5 ).extractPoints();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/densify.png" alt="densify.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-envelope">Envelope</h4>
+<div class="paragraph"><p>The Envelope pipe computes the minimum bounding box of item geometry.
+Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline
+    .start( linesLayer )
+    .toEnvelope();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/envelope.png" alt="envelope.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-export-to-gml">Export to GML</h4>
+<div class="paragraph"><p>This pipe exports every
+geometry as a <a href="http://en.wikipedia.org/wiki/Geography_Markup_Language">GML</a> snippet.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( boxesLayer ).createGML();
+for ( GeoPipeFlow flow : pipeline ) {
+    System.out.println(flow.getProperties().get( "GML" ));
+ }</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="listingblock">
+<pre class="programlisting brush: xml">&lt;gml:Polygon&gt;
+  &lt;gml:outerBoundaryIs&gt;
+    &lt;gml:LinearRing&gt;
+      &lt;gml:coordinates&gt;
+        12.0,26.0 12.0,27.0 13.0,27.0 13.0,26.0 12.0,26.0
+      &lt;/gml:coordinates&gt;
+    &lt;/gml:LinearRing&gt;
+  &lt;/gml:outerBoundaryIs&gt;
+&lt;/gml:Polygon&gt;
+&lt;gml:Polygon&gt;
+  &lt;gml:outerBoundaryIs&gt;
+    &lt;gml:LinearRing&gt;
+      &lt;gml:coordinates&gt;
+        2.0,3.0 2.0,5.0 6.0,5.0 6.0,3.0 2.0,3.0
+      &lt;/gml:coordinates&gt;
+    &lt;/gml:LinearRing&gt;
+  &lt;/gml:outerBoundaryIs&gt;
+&lt;/gml:Polygon&gt;</pre></div>
+</div>
+<div class="sect3">
+<h4 id="examples-intersection">Intersection</h4>
+<div class="paragraph"><p>The Intersection pipe computes a geometry representing the intersection between item geometry and the given geometry.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">WKTReader reader = new WKTReader( intersectionLayer.getGeometryFactory() );
+Geometry geometry = reader.read( "POLYGON ((3 3, 3 5, 7 7, 7 3, 3 3))" );
+GeoPipeline pipeline = GeoPipeline.start( intersectionLayer ).intersect( geometry );</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/intersection.png" alt="intersection.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-union">Union</h4>
+<div class="paragraph"><p>The Union pipe unites item geometry with a given geometry.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">WKTReader reader = new WKTReader( intersectionLayer.getGeometryFactory() );
+Geometry geometry = reader.read( "POLYGON ((3 3, 3 5, 7 7, 7 3, 3 3))" );
+SearchFilter filter = new SearchIntersectWindow( intersectionLayer, new Envelope( 7, 10, 7, 10 ) );
+GeoPipeline pipeline = GeoPipeline.start( intersectionLayer, filter ).union( geometry );</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/union.png" alt="union.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-start-point">Start Point</h4>
+<div class="paragraph"><p>The StartPoint pipe finds the starting point of item geometry.
+Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline
+    .start( linesLayer )
+    .toStartPoint();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/start_point.png" alt="start_point.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-end-point">End Point</h4>
+<div class="paragraph"><p>The EndPoint pipe finds the ending point of item geometry.
+Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline
+    .start( linesLayer )
+    .toEndPoint();</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/end_point.png" alt="end_point.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-max">Max</h4>
+<div class="paragraph"><p>The Max pipe computes the maximum value of the specified property and
+discard items with a value less than the maximum.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( boxesLayer )
+    .calculateArea()
+    .getMax( "Area" );</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/max.png" alt="max.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-min">Min</h4>
+<div class="paragraph"><p>The Min pipe computes the minimum value of the specified property and
+discard items with a value greater than the minimum.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">GeoPipeline pipeline = GeoPipeline.start( boxesLayer )
+    .calculateArea()
+    .getMin( "Area" );</pre>
+</div></div>
+<div class="paragraph"><p>Output:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/min.png" alt="min.png">
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="examples-break-up-all-geometries-into-points-and-make-density-islands">Break up all geometries into points and make density islands</h4>
+<div class="paragraph"><p>A more complex Open Street Map example.</p></div>
+<div class="paragraph"><p>This example demostrates the some pipes chained together to make a full
+geoprocessing pipeline.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock"><div class="content">
+<pre class="programlisting brush: java">//step1
+GeoPipeline pipeline = OSMGeoPipeline.startOsm( osmLayer )
+        //step2
+    .extractOsmPoints()
+    //step3
+    .groupByDensityIslands( 0.0005 )
+    //step4
+    .toConvexHull()
+    //step5
+    .toBuffer( 0.0004 );</pre>
+</div></div>
+<div class="paragraph"><p><em>Step1</em></p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/step1_break_up_all_geometries_into_points_and_make_density_islands.png" alt="step1_break_up_all_geometries_into_points_and_make_density_islands.png">
+</div>
+</div>
+<div class="paragraph"><p><em>Step2</em></p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/step2_break_up_all_geometries_into_points_and_make_density_islands.png" alt="step2_break_up_all_geometries_into_points_and_make_density_islands.png">
+</div>
+</div>
+<div class="paragraph"><p><em>Step3</em></p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/step3_break_up_all_geometries_into_points_and_make_density_islands.png" alt="step3_break_up_all_geometries_into_points_and_make_density_islands.png">
+</div>
+</div>
+<div class="paragraph"><p><em>Step4</em></p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/step4_break_up_all_geometries_into_points_and_make_density_islands.png" alt="step4_break_up_all_geometries_into_points_and_make_density_islands.png">
+</div>
+</div>
+<div class="paragraph"><p><em>Step5</em></p></div>
+<div class="imageblock">
+<div class="content">
+<img src="images/step5_break_up_all_geometries_into_points_and_make_density_islands.png" alt="step5_break_up_all_geometries_into_points_and_make_density_islands.png">
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2013-05-06 14:14:46 CEST
+</div>
+</div>
+</body>
+</html>
