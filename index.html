@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="generator" content="AsciiDoc 8.6.8">
-<title>Neo4j Spatial v0.11-SNAPSHOT</title>
+<title>Neo4j Spatial v0.12-neo4j-2.0.0-SNAPSHOT</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -795,7 +795,7 @@ asciidoc.install(2);
 </head>
 <body class="book">
 <div id="header">
-<h1>Neo4j Spatial v0.11-SNAPSHOT</h1>
+<h1>Neo4j Spatial v0.12-neo4j-2.0.0-SNAPSHOT</h1>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -979,6 +979,766 @@ The set of <span class="monospaced">Geometries</span> provided by this layer inc
 However, <span class="monospaced">OMSLayer</span> extends <span class="monospaced">DynamicLayer</span>, which allow it to provide any number of sub-layers, each with a specific geometry type and in addition based on a OSM tag filter.
 For example you can have a layer providing all cycle paths as <span class="monospaced">LineStrings</span>, or a layer providing all lakes as <span class="monospaced">Polygons</span>.
 Underneath these are all still backed by the same fully connected graph, but exposed dynamically as apparently separate geometry layers.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="spatial-server-plugin">Using the Neo4j Spatial Server plugin</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Neo4j Spatial is also packaged as a ZIP file that can be unzipped into the (<a href="http://neo4j.org)">Neo4j Server</a> /plugin directory. After restarting the server, you should be able to do things like the following REST calls</p></div>
+<div class="sect2">
+<h3 id="rest-api-finding-the-plugin">Finding the plugin</h3>
+<div class="paragraph"><p>The Neo4j Spatial Server plugin, if
+installed, will be announced in the root representation
+for the Neo4j Server REST API.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-finding-the-plugin.svg" alt="Final-Graph-finding-the-plugin.svg">
+</div>
+<div class="title">Figure 1. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">GET</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "graphdb" : {
+    "addEditableLayer" : {
+      "extends" : "graphdb",
+      "description" : "add a new layer specialized at storing generic geometry data in WKB",
+      "name" : "addEditableLayer",
+      "parameters" : [ {
+        "description" : "The layer to find or create.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      }, {
+        "description" : "The format for internal representation, either WKB or WKT",
+        "optional" : true,
+        "name" : "format",
+        "type" : "string"
+      } ]
+    },
+    "addCQLDynamicLayer" : {
+      "extends" : "graphdb",
+      "description" : "add a new dynamic layer exposing a filtered view of an existing layer",
+      "name" : "addCQLDynamicLayer",
+      "parameters" : [ {
+        "description" : "The master layer to find",
+        "optional" : false,
+        "name" : "master_layer",
+        "type" : "string"
+      }, {
+        "description" : "The name for the new dynamic layer",
+        "optional" : false,
+        "name" : "name",
+        "type" : "string"
+      }, {
+        "description" : "The type of geometry to use for streaming data from the new view",
+        "optional" : true,
+        "name" : "geometry",
+        "type" : "string"
+      }, {
+        "description" : "The CQL query to use for defining this dynamic layer",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    },
+    "findGeometriesWithinDistance" : {
+      "extends" : "graphdb",
+      "description" : "search a layer for geometries within a distance of a point. To achieve more complex CQL searches, pre-define the dynamic layer with addCQLDynamicLayer.",
+      "name" : "findGeometriesWithinDistance",
+      "parameters" : [ {
+        "description" : "The x value of a point",
+        "optional" : false,
+        "name" : "pointX",
+        "type" : "double"
+      }, {
+        "description" : "The y value of a point",
+        "optional" : false,
+        "name" : "pointY",
+        "type" : "double"
+      }, {
+        "description" : "The distance from the point to search",
+        "optional" : false,
+        "name" : "distanceInKm",
+        "type" : "double"
+      }, {
+        "description" : "The layer to search. Can be a dynamic layer with pre-defined CQL filter.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    },
+    "updateGeometryFromWKT" : {
+      "extends" : "graphdb",
+      "description" : "update an existing geometry specified in WKT format. The layer must already contain the record.",
+      "name" : "updateGeometryFromWKT",
+      "parameters" : [ {
+        "description" : "The geometry in WKT to add to the layer",
+        "optional" : false,
+        "name" : "geometry",
+        "type" : "string"
+      }, {
+        "description" : "The geometry node id",
+        "optional" : false,
+        "name" : "node",
+        "type" : "long"
+      }, {
+        "description" : "The layer to add the node to.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    },
+    "addGeometryWKTToLayer" : {
+      "extends" : "graphdb",
+      "description" : "add a geometry specified in WKT format to a layer, encoding in the specified layers encoding schemea.",
+      "name" : "addGeometryWKTToLayer",
+      "parameters" : [ {
+        "description" : "The geometry in WKT to add to the layer",
+        "optional" : false,
+        "name" : "geometry",
+        "type" : "string"
+      }, {
+        "description" : "The layer to add the node to.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    },
+    "getLayer" : {
+      "extends" : "graphdb",
+      "description" : "find an existing layer",
+      "name" : "getLayer",
+      "parameters" : [ {
+        "description" : "The layer to find.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    },
+    "addSimplePointLayer" : {
+      "extends" : "graphdb",
+      "description" : "add a new layer specialized at storing simple point location data",
+      "name" : "addSimplePointLayer",
+      "parameters" : [ {
+        "description" : "The layer to find or create.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      }, {
+        "description" : "The node property that contains the latitude. Default is 'lat'",
+        "optional" : true,
+        "name" : "lat",
+        "type" : "string"
+      }, {
+        "description" : "The node property that contains the longitude. Default is 'lon'",
+        "optional" : true,
+        "name" : "lon",
+        "type" : "string"
+      } ]
+    },
+    "findGeometriesInBBox" : {
+      "extends" : "graphdb",
+      "description" : "search a layer for geometries in a bounding box. To achieve more complex CQL searches, pre-define the dynamic layer with addCQLDynamicLayer.",
+      "name" : "findGeometriesInBBox",
+      "parameters" : [ {
+        "description" : "The minimum x value of the bounding box",
+        "optional" : false,
+        "name" : "minx",
+        "type" : "double"
+      }, {
+        "description" : "The maximum x value of the bounding box",
+        "optional" : false,
+        "name" : "maxx",
+        "type" : "double"
+      }, {
+        "description" : "The minimum y value of the bounding box",
+        "optional" : false,
+        "name" : "miny",
+        "type" : "double"
+      }, {
+        "description" : "The maximum y value of the bounding box",
+        "optional" : false,
+        "name" : "maxy",
+        "type" : "double"
+      }, {
+        "description" : "The layer to search. Can be a dynamic layer with pre-defined CQL filter.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    },
+    "addNodeToLayer" : {
+      "extends" : "graphdb",
+      "description" : "add a geometry node to a layer, as long as the node contains the geometry information appropriate to this layer.",
+      "name" : "addNodeToLayer",
+      "parameters" : [ {
+        "description" : "The node representing a geometry to add to the layer",
+        "optional" : false,
+        "name" : "node",
+        "type" : "node"
+      }, {
+        "description" : "The layer to add the node to.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    }
+  }
+}</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-create-a-pointlayer">Create a pointlayer</h3>
+<div class="paragraph"><p>Firstly, create a point layer, specifying the <span class="monospaced">lon</span> and <span class="monospaced">lat</span> node properties as the ones carrying the
+spatial information.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-create-a-pointlayer.svg" alt="Final-Graph-create-a-pointlayer.svg">
+</div>
+<div class="title">Figure 2. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/addSimplePointLayer</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom",
+  "lat" : "lat",
+  "lon" : "lon"
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "paged_traverse" : "http://localhost:7575/db/data/node/22/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/22/relationships/out",
+  "data" : {
+    "layer_class" : "org.neo4j.gis.spatial.EditableLayerImpl",
+    "layer" : "geom",
+    "geomencoder" : "org.neo4j.gis.spatial.encoders.SimplePointEncoder",
+    "geomencoder_config" : "lon:lat",
+    "ctime" : 1371675223580
+  },
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/22/relationships/all/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/22/traverse/{returnType}",
+  "self" : "http://localhost:7575/db/data/node/22",
+  "all_relationships" : "http://localhost:7575/db/data/node/22/relationships/all",
+  "property" : "http://localhost:7575/db/data/node/22/properties/{key}",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/22/relationships/out/{-list|&amp;|types}",
+  "properties" : "http://localhost:7575/db/data/node/22/properties",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/22/relationships/in",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/22/relationships/in/{-list|&amp;|types}",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/22/relationships"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-create-a-spatial-index">Create a spatial index</h3>
+<div class="paragraph"><p>Now, add that node to the spatial
+layer.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-create-a-spatial-index.svg" alt="Final-Graph-create-a-spatial-index.svg">
+</div>
+<div class="title">Figure 3. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/index/node/</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "name" : "geom",
+  "config" : {
+    "provider" : "spatial",
+    "geometry_type" : "point",
+    "lat" : "lat",
+    "lon" : "lon"
+  }
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">201:</span></strong> <span class="monospaced">Created</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Location:</span></strong> <span class="monospaced">http://localhost:7575/db/data/index/node/geom/</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "template" : "http://localhost:7575/db/data/index/node/geom/{key}/{value}",
+  "provider" : "spatial",
+  "geometry_type" : "point",
+  "lat" : "lat",
+  "lon" : "lon"
+}</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-create-a-node-with-spatial-data">Create a node with spatial data</h3>
+<div class="paragraph"><p>Create a node with some spatial data like <span class="monospaced">lon</span> and <span class="monospaced">lat</span>
+attached.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-create-a-node-with-spatial-data.svg" alt="Final-Graph-create-a-node-with-spatial-data.svg">
+</div>
+<div class="title">Figure 4. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/node</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "lat" : 60.1,
+  "lon" : 15.2
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">201:</span></strong> <span class="monospaced">Created</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Location:</span></strong> <span class="monospaced">http://localhost:7575/db/data/node/38</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "extensions" : {
+  },
+  "paged_traverse" : "http://localhost:7575/db/data/node/38/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/38/relationships/out",
+  "traverse" : "http://localhost:7575/db/data/node/38/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/38/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/38/properties/{key}",
+  "all_relationships" : "http://localhost:7575/db/data/node/38/relationships/all",
+  "self" : "http://localhost:7575/db/data/node/38",
+  "properties" : "http://localhost:7575/db/data/node/38/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/38/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/38/relationships/in",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/38/relationships/in/{-list|&amp;|types}",
+  "create_relationship" : "http://localhost:7575/db/data/node/38/relationships",
+  "data" : {
+    "lon" : 15.2,
+    "lat" : 60.1
+  }
+}</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-add-a-node-to-the-spatial-index">Add a node to the spatial index</h3>
+<div class="paragraph"><p>Add the node we created to the spatial
+index.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-add-a-node-to-the-spatial-index.svg" alt="Final-Graph-add-a-node-to-the-spatial-index.svg">
+</div>
+<div class="title">Figure 5. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/addNodeToLayer</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom",
+  "node" : "http://localhost:7575/db/data/node/33"
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "paged_traverse" : "http://localhost:7575/db/data/node/33/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/33/relationships/out",
+  "data" : {
+    "lon" : 15.2,
+    "bbox" : [ 15.2, 60.1, 15.2, 60.1 ],
+    "lat" : 60.1,
+    "gtype" : 1
+  },
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/33/relationships/all/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/33/traverse/{returnType}",
+  "self" : "http://localhost:7575/db/data/node/33",
+  "all_relationships" : "http://localhost:7575/db/data/node/33/relationships/all",
+  "property" : "http://localhost:7575/db/data/node/33/properties/{key}",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/33/relationships/out/{-list|&amp;|types}",
+  "properties" : "http://localhost:7575/db/data/node/33/properties",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/33/relationships/in",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/33/relationships/in/{-list|&amp;|types}",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/33/relationships"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-find-geometries-in-a-bounding-box">Find geometries in a bounding box</h3>
+<div class="paragraph"><p>Find geometries in a bounding
+box.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-find-geometries-in-a-bounding-box.svg" alt="Final-Graph-find-geometries-in-a-bounding-box.svg">
+</div>
+<div class="title">Figure 6. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/findGeometriesInBBox</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom",
+  "minx" : 15.0,
+  "maxx" : 15.3,
+  "miny" : 60.0,
+  "maxy" : 60.2
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "paged_traverse" : "http://localhost:7575/db/data/node/43/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/43/relationships/out",
+  "data" : {
+    "lon" : 15.2,
+    "bbox" : [ 15.2, 60.1, 15.2, 60.1 ],
+    "lat" : 60.1,
+    "gtype" : 1
+  },
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/43/relationships/all/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/43/traverse/{returnType}",
+  "self" : "http://localhost:7575/db/data/node/43",
+  "all_relationships" : "http://localhost:7575/db/data/node/43/relationships/all",
+  "property" : "http://localhost:7575/db/data/node/43/properties/{key}",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/43/relationships/out/{-list|&amp;|types}",
+  "properties" : "http://localhost:7575/db/data/node/43/properties",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/43/relationships/in",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/43/relationships/in/{-list|&amp;|types}",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/43/relationships"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-find-geometries-within--distance">Find geometries within  distance</h3>
+<div class="paragraph"><p>Find geometries within a
+distance.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-find-geometries-within--distance.svg" alt="Final-Graph-find-geometries-within--distance.svg">
+</div>
+<div class="title">Figure 7. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/findGeometriesWithinDistance</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom",
+  "pointX" : 15.0,
+  "pointY" : 60.0,
+  "distanceInKm" : 100
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "paged_traverse" : "http://localhost:7575/db/data/node/15/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/15/relationships/out",
+  "data" : {
+    "lon" : 15.2,
+    "bbox" : [ 15.2, 60.1, 15.2, 60.1 ],
+    "lat" : 60.1,
+    "gtype" : 1
+  },
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/15/relationships/all/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/15/traverse/{returnType}",
+  "self" : "http://localhost:7575/db/data/node/15",
+  "all_relationships" : "http://localhost:7575/db/data/node/15/relationships/all",
+  "property" : "http://localhost:7575/db/data/node/15/properties/{key}",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/15/relationships/out/{-list|&amp;|types}",
+  "properties" : "http://localhost:7575/db/data/node/15/properties",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/15/relationships/in",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/15/relationships/in/{-list|&amp;|types}",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/15/relationships"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-find-geometries-in-a-bounding-box-using-cypher">Find geometries in a bounding box using cypher</h3>
+<div class="paragraph"><p>Find geometries in a bounding
+box.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-find-geometries-in-a-bounding-box-using-cypher.svg" alt="Final-Graph-find-geometries-in-a-bounding-box-using-cypher.svg">
+</div>
+<div class="title">Figure 8. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/cypher</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "query" : "start node = node:geom('bbox:[15.0,15.3,60.0,60.2]') return node"
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "columns" : [ "node" ],
+  "data" : [ ]
+}</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-find-geometries-within--distance-using-cypher">Find geometries within  distance using cypher</h3>
+<div class="paragraph"><p>Find geometries within a distance, using
+Cypher.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-find-geometries-within--distance-using-cypher.svg" alt="Final-Graph-find-geometries-within--distance-using-cypher.svg">
+</div>
+<div class="title">Figure 9. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/cypher</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "query" : "start node = node:geom('withinDistance:[15.0,15.3,60.0,60.2, 5.0]') return node"
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "columns" : [ "node" ],
+  "data" : [ ]
+}</pre></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1594,7 +2354,7 @@ GeoPipeline pipeline = OSMGeoPipeline.startOsm( osmLayer )
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-05-06 14:48:36 CEST
+Last updated 2013-06-19 20:55:31 CEST
 </div>
 </div>
 </body>
