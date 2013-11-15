@@ -805,7 +805,7 @@ asciidoc.install(2);
 <div class="sect1">
 <h2 id="spatial-introduction">Introduction</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>Neo4j Spatial is a library of utilities for Neo4j that facilitate the enabling of spatial operations on data.
+<div class="paragraph"><p><a href="http://neo4j.github.io/spatial/">Neo4j Spatial</a> is a library of utilities for Neo4j that facilitate the enabling of spatial operations on data.
 In particular you can add spatial indexes to already located data, and perform spatial operations on the data like searching for data within specified regions or within a specified distance of a point of interest.
 In addition classes are provided to expose the data to GeoTools and thereby to GeoTools-enabled applications like GeoServer and uDig.</p></div>
 <div class="imageblock">
@@ -1005,7 +1005,7 @@ for the Neo4j Server REST API.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
@@ -1018,7 +1018,7 @@ for the Neo4j Server REST API.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
@@ -1036,8 +1036,13 @@ for the Neo4j Server REST API.</p></div>
         "type" : "string"
       }, {
         "description" : "The format for internal representation, either WKB or WKT",
-        "optional" : true,
+        "optional" : false,
         "name" : "format",
+        "type" : "string"
+      }, {
+        "description" : "The name of the node property carrying the spatial geometry info",
+        "optional" : false,
+        "name" : "nodePropertyName",
         "type" : "string"
       } ]
     },
@@ -1105,7 +1110,7 @@ for the Neo4j Server REST API.</p></div>
       }, {
         "description" : "The geometry node id",
         "optional" : false,
-        "name" : "node",
+        "name" : "geometryNodeId",
         "type" : "long"
       }, {
         "description" : "The layer to add the node to.",
@@ -1136,6 +1141,32 @@ for the Neo4j Server REST API.</p></div>
       "name" : "getLayer",
       "parameters" : [ {
         "description" : "The layer to find.",
+        "optional" : false,
+        "name" : "layer",
+        "type" : "string"
+      } ]
+    },
+    "findClosestGeometries" : {
+      "extends" : "graphdb",
+      "description" : "search a layer for the closest geometries and return them.",
+      "name" : "findClosestGeometries",
+      "parameters" : [ {
+        "description" : "The x value of a point",
+        "optional" : false,
+        "name" : "pointX",
+        "type" : "double"
+      }, {
+        "description" : "The y value of a point",
+        "optional" : false,
+        "name" : "pointY",
+        "type" : "double"
+      }, {
+        "description" : "The maximum distance in km",
+        "optional" : false,
+        "name" : "distanceInKm",
+        "type" : "double"
+      }, {
+        "description" : "The layer to search. Can be a dynamic layer with pre-defined CQL filter.",
         "optional" : false,
         "name" : "layer",
         "type" : "string"
@@ -1214,7 +1245,7 @@ for the Neo4j Server REST API.</p></div>
 </div>
 <div class="sect2">
 <h3 id="rest-api-create-a-pointlayer">Create a pointlayer</h3>
-<div class="paragraph"><p>Firstly, create a point layer, specifying the <span class="monospaced">lon</span> and <span class="monospaced">lat</span> node properties as the ones carrying the
+<div class="paragraph"><p>Create a point layer, specifying the <span class="monospaced">lon</span> and <span class="monospaced">lat</span> node properties as the ones carrying the
 spatial information.</p></div>
 <div class="imageblock dot">
 <div class="content">
@@ -1231,7 +1262,7 @@ spatial information.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1255,44 +1286,331 @@ spatial information.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">[ {
-  "paged_traverse" : "http://localhost:7575/db/data/node/22/paged/traverse/{returnType}{?pageSize,leaseTime}",
-  "outgoing_relationships" : "http://localhost:7575/db/data/node/22/relationships/out",
+  "labels" : "http://localhost:7575/db/data/node/39/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/39/relationships/out",
   "data" : {
     "layer_class" : "org.neo4j.gis.spatial.EditableLayerImpl",
     "layer" : "geom",
     "geomencoder" : "org.neo4j.gis.spatial.encoders.SimplePointEncoder",
     "geomencoder_config" : "lon:lat",
-    "ctime" : 1371675223580
+    "ctime" : 1384521977725
   },
-  "all_typed_relationships" : "http://localhost:7575/db/data/node/22/relationships/all/{-list|&amp;|types}",
-  "traverse" : "http://localhost:7575/db/data/node/22/traverse/{returnType}",
-  "self" : "http://localhost:7575/db/data/node/22",
-  "all_relationships" : "http://localhost:7575/db/data/node/22/relationships/all",
-  "property" : "http://localhost:7575/db/data/node/22/properties/{key}",
-  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/22/relationships/out/{-list|&amp;|types}",
-  "properties" : "http://localhost:7575/db/data/node/22/properties",
-  "incoming_relationships" : "http://localhost:7575/db/data/node/22/relationships/in",
-  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/22/relationships/in/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/39/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/39/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/39/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/39",
+  "properties" : "http://localhost:7575/db/data/node/39/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/39/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/39/relationships/in",
   "extensions" : {
   },
-  "create_relationship" : "http://localhost:7575/db/data/node/22/relationships"
+  "create_relationship" : "http://localhost:7575/db/data/node/39/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/39/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/39/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/39/relationships/in/{-list|&amp;|types}"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-create-a-wkt-layer">Create a WKT layer</h3>
+<div class="paragraph"><p>Creates a layer with nodes that have a
+property containing WKT or WKB, returns the layer node containing the configuration for the newly
+created layer.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-create-a-WKT-layer.svg" alt="Final-Graph-create-a-WKT-layer.svg">
+</div>
+<div class="title">Figure 3. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/addEditableLayer</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom",
+  "format" : "WKT",
+  "nodePropertyName" : "wkt"
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "labels" : "http://localhost:7575/db/data/node/47/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/47/relationships/out",
+  "data" : {
+    "layer_class" : "org.neo4j.gis.spatial.EditableLayerImpl",
+    "layer" : "geom",
+    "geomencoder" : "org.neo4j.gis.spatial.WKTGeometryEncoder",
+    "geomencoder_config" : "wkt",
+    "ctime" : 1384521977841
+  },
+  "traverse" : "http://localhost:7575/db/data/node/47/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/47/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/47/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/47",
+  "properties" : "http://localhost:7575/db/data/node/47/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/47/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/47/relationships/in",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/47/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/47/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/47/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/47/relationships/in/{-list|&amp;|types}"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-find-layer">Find layer</h3>
+<div class="paragraph"><p>Find a layer by its name, returning th layer
+.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-find-layer.svg" alt="Final-Graph-find-layer.svg">
+</div>
+<div class="title">Figure 4. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/getLayer</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom"
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "labels" : "http://localhost:7575/db/data/node/29/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/29/relationships/out",
+  "data" : {
+    "layer_class" : "org.neo4j.gis.spatial.EditableLayerImpl",
+    "layer" : "geom",
+    "geomencoder" : "org.neo4j.gis.spatial.WKTGeometryEncoder",
+    "geomencoder_config" : "wkt",
+    "ctime" : 1384521977326
+  },
+  "traverse" : "http://localhost:7575/db/data/node/29/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/29/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/29/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/29",
+  "properties" : "http://localhost:7575/db/data/node/29/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/29/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/29/relationships/in",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/29/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/29/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/29/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/29/relationships/in/{-list|&amp;|types}"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-add-a-wkt-geometry-to-a-layer">Add a WKT geometry to a layer</h3>
+<div class="paragraph"><p>Add a geometry, encoded in WKT, to a
+layer.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-add-a-WKT-geometry-to-a-layer.svg" alt="Final-Graph-add-a-WKT-geometry-to-a-layer.svg">
+</div>
+<div class="title">Figure 5. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/addGeometryWKTToLayer</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom",
+  "geometry" : "LINESTRING (15.2 60.1, 15.3 60.1)"
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "labels" : "http://localhost:7575/db/data/node/5/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/5/relationships/out",
+  "data" : {
+    "bbox" : [ 15.2, 60.1, 15.3, 60.1 ],
+    "wkt" : "LINESTRING (15.2 60.1, 15.3 60.1)",
+    "gtype" : 2
+  },
+  "traverse" : "http://localhost:7575/db/data/node/5/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/5/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/5/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/5",
+  "properties" : "http://localhost:7575/db/data/node/5/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/5/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/5/relationships/in",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/5/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/5/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/5/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/5/relationships/in/{-list|&amp;|types}"
+} ]</pre></div>
+</div>
+<div class="sect2">
+<h3 id="rest-api-update-a-wkt-geometry-in-a-layer">Update a WKT geometry in a layer</h3>
+<div class="paragraph"><p>Update a geometry, encoded in WKT, on an existing geometry in a
+layer.</p></div>
+<div class="imageblock dot">
+<div class="content">
+<img src="images/Final-Graph-update-a-WKT-geometry-in-a-layer.svg" alt="Final-Graph-update-a-WKT-geometry-in-a-layer.svg">
+</div>
+<div class="title">Figure 6. Final Graph</div>
+</div>
+<div class="paragraph"><p><em>Example request</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">POST</span></strong>  <span class="monospaced">http://localhost:7575/db/data/ext/SpatialPlugin/graphdb/updateGeometryFromWKT</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">{
+  "layer" : "geom",
+  "geometry" : "LINESTRING (16.2 60.1, 15.3 60.1)",
+  "geometryNodeId" : 77
+}</pre></div>
+<div class="paragraph"><p><em>Example response</em></p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong><span class="monospaced">200:</span></strong> <span class="monospaced">OK</span>
+</p>
+</li>
+<li>
+<p>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<pre class="programlisting brush: javascript">[ {
+  "labels" : "http://localhost:7575/db/data/node/77/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/77/relationships/out",
+  "data" : {
+    "bbox" : [ 15.3, 60.1, 16.2, 60.1 ],
+    "wkt" : "LINESTRING (16.2 60.1, 15.3 60.1)",
+    "gtype" : 2
+  },
+  "traverse" : "http://localhost:7575/db/data/node/77/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/77/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/77/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/77",
+  "properties" : "http://localhost:7575/db/data/node/77/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/77/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/77/relationships/in",
+  "extensions" : {
+  },
+  "create_relationship" : "http://localhost:7575/db/data/node/77/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/77/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/77/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/77/relationships/in/{-list|&amp;|types}"
 } ]</pre></div>
 </div>
 <div class="sect2">
 <h3 id="rest-api-create-a-spatial-index">Create a spatial index</h3>
-<div class="paragraph"><p>Now, add that node to the spatial
+<div class="paragraph"><p>Add that node to the spatial
 layer.</p></div>
 <div class="imageblock dot">
 <div class="content">
 <img src="images/Final-Graph-create-a-spatial-index.svg" alt="Final-Graph-create-a-spatial-index.svg">
 </div>
-<div class="title">Figure 3. Final Graph</div>
+<div class="title">Figure 7. Final Graph</div>
 </div>
 <div class="paragraph"><p><em>Example request</em></p></div>
 <div class="ulist"><ul>
@@ -1303,7 +1621,7 @@ layer.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1331,7 +1649,7 @@ layer.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1357,7 +1675,7 @@ attached.</p></div>
 <div class="content">
 <img src="images/Final-Graph-create-a-node-with-spatial-data.svg" alt="Final-Graph-create-a-node-with-spatial-data.svg">
 </div>
-<div class="title">Figure 4. Final Graph</div>
+<div class="title">Figure 8. Final Graph</div>
 </div>
 <div class="paragraph"><p><em>Example request</em></p></div>
 <div class="ulist"><ul>
@@ -1368,7 +1686,7 @@ attached.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1391,12 +1709,12 @@ attached.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Location:</span></strong> <span class="monospaced">http://localhost:7575/db/data/node/38</span>
+<strong><span class="monospaced">Location:</span></strong> <span class="monospaced">http://localhost:7575/db/data/node/59</span>
 </p>
 </li>
 </ul></div>
@@ -1404,18 +1722,19 @@ attached.</p></div>
 <pre class="programlisting brush: javascript">{
   "extensions" : {
   },
-  "paged_traverse" : "http://localhost:7575/db/data/node/38/paged/traverse/{returnType}{?pageSize,leaseTime}",
-  "outgoing_relationships" : "http://localhost:7575/db/data/node/38/relationships/out",
-  "traverse" : "http://localhost:7575/db/data/node/38/traverse/{returnType}",
-  "all_typed_relationships" : "http://localhost:7575/db/data/node/38/relationships/all/{-list|&amp;|types}",
-  "property" : "http://localhost:7575/db/data/node/38/properties/{key}",
-  "all_relationships" : "http://localhost:7575/db/data/node/38/relationships/all",
-  "self" : "http://localhost:7575/db/data/node/38",
-  "properties" : "http://localhost:7575/db/data/node/38/properties",
-  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/38/relationships/out/{-list|&amp;|types}",
-  "incoming_relationships" : "http://localhost:7575/db/data/node/38/relationships/in",
-  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/38/relationships/in/{-list|&amp;|types}",
-  "create_relationship" : "http://localhost:7575/db/data/node/38/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/59/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "labels" : "http://localhost:7575/db/data/node/59/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/59/relationships/out",
+  "traverse" : "http://localhost:7575/db/data/node/59/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/59/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/59/properties/{key}",
+  "all_relationships" : "http://localhost:7575/db/data/node/59/relationships/all",
+  "self" : "http://localhost:7575/db/data/node/59",
+  "properties" : "http://localhost:7575/db/data/node/59/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/59/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/59/relationships/in",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/59/relationships/in/{-list|&amp;|types}",
+  "create_relationship" : "http://localhost:7575/db/data/node/59/relationships",
   "data" : {
     "lon" : 15.2,
     "lat" : 60.1
@@ -1430,7 +1749,7 @@ index.</p></div>
 <div class="content">
 <img src="images/Final-Graph-add-a-node-to-the-spatial-index.svg" alt="Final-Graph-add-a-node-to-the-spatial-index.svg">
 </div>
-<div class="title">Figure 5. Final Graph</div>
+<div class="title">Figure 9. Final Graph</div>
 </div>
 <div class="paragraph"><p><em>Example request</em></p></div>
 <div class="ulist"><ul>
@@ -1441,7 +1760,7 @@ index.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1453,7 +1772,7 @@ index.</p></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">{
   "layer" : "geom",
-  "node" : "http://localhost:7575/db/data/node/33"
+  "node" : "http://localhost:7575/db/data/node/54"
 }</pre></div>
 <div class="paragraph"><p><em>Example response</em></p></div>
 <div class="ulist"><ul>
@@ -1464,32 +1783,33 @@ index.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">[ {
-  "paged_traverse" : "http://localhost:7575/db/data/node/33/paged/traverse/{returnType}{?pageSize,leaseTime}",
-  "outgoing_relationships" : "http://localhost:7575/db/data/node/33/relationships/out",
+  "labels" : "http://localhost:7575/db/data/node/54/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/54/relationships/out",
   "data" : {
     "lon" : 15.2,
     "bbox" : [ 15.2, 60.1, 15.2, 60.1 ],
-    "lat" : 60.1,
-    "gtype" : 1
+    "gtype" : 1,
+    "lat" : 60.1
   },
-  "all_typed_relationships" : "http://localhost:7575/db/data/node/33/relationships/all/{-list|&amp;|types}",
-  "traverse" : "http://localhost:7575/db/data/node/33/traverse/{returnType}",
-  "self" : "http://localhost:7575/db/data/node/33",
-  "all_relationships" : "http://localhost:7575/db/data/node/33/relationships/all",
-  "property" : "http://localhost:7575/db/data/node/33/properties/{key}",
-  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/33/relationships/out/{-list|&amp;|types}",
-  "properties" : "http://localhost:7575/db/data/node/33/properties",
-  "incoming_relationships" : "http://localhost:7575/db/data/node/33/relationships/in",
-  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/33/relationships/in/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/54/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/54/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/54/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/54",
+  "properties" : "http://localhost:7575/db/data/node/54/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/54/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/54/relationships/in",
   "extensions" : {
   },
-  "create_relationship" : "http://localhost:7575/db/data/node/33/relationships"
+  "create_relationship" : "http://localhost:7575/db/data/node/54/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/54/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/54/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/54/relationships/in/{-list|&amp;|types}"
 } ]</pre></div>
 </div>
 <div class="sect2">
@@ -1500,7 +1820,7 @@ box.</p></div>
 <div class="content">
 <img src="images/Final-Graph-find-geometries-in-a-bounding-box.svg" alt="Final-Graph-find-geometries-in-a-bounding-box.svg">
 </div>
-<div class="title">Figure 6. Final Graph</div>
+<div class="title">Figure 10. Final Graph</div>
 </div>
 <div class="paragraph"><p><em>Example request</em></p></div>
 <div class="ulist"><ul>
@@ -1511,7 +1831,7 @@ box.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1526,7 +1846,7 @@ box.</p></div>
   "minx" : 15.0,
   "maxx" : 15.3,
   "miny" : 60.0,
-  "maxy" : 60.2
+  "maxy" : 61.0
 }</pre></div>
 <div class="paragraph"><p><em>Example response</em></p></div>
 <div class="ulist"><ul>
@@ -1537,32 +1857,33 @@ box.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">[ {
-  "paged_traverse" : "http://localhost:7575/db/data/node/43/paged/traverse/{returnType}{?pageSize,leaseTime}",
-  "outgoing_relationships" : "http://localhost:7575/db/data/node/43/relationships/out",
+  "labels" : "http://localhost:7575/db/data/node/72/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/72/relationships/out",
   "data" : {
     "lon" : 15.2,
     "bbox" : [ 15.2, 60.1, 15.2, 60.1 ],
-    "lat" : 60.1,
-    "gtype" : 1
+    "gtype" : 1,
+    "lat" : 60.1
   },
-  "all_typed_relationships" : "http://localhost:7575/db/data/node/43/relationships/all/{-list|&amp;|types}",
-  "traverse" : "http://localhost:7575/db/data/node/43/traverse/{returnType}",
-  "self" : "http://localhost:7575/db/data/node/43",
-  "all_relationships" : "http://localhost:7575/db/data/node/43/relationships/all",
-  "property" : "http://localhost:7575/db/data/node/43/properties/{key}",
-  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/43/relationships/out/{-list|&amp;|types}",
-  "properties" : "http://localhost:7575/db/data/node/43/properties",
-  "incoming_relationships" : "http://localhost:7575/db/data/node/43/relationships/in",
-  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/43/relationships/in/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/72/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/72/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/72/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/72",
+  "properties" : "http://localhost:7575/db/data/node/72/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/72/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/72/relationships/in",
   "extensions" : {
   },
-  "create_relationship" : "http://localhost:7575/db/data/node/43/relationships"
+  "create_relationship" : "http://localhost:7575/db/data/node/72/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/72/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/72/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/72/relationships/in/{-list|&amp;|types}"
 } ]</pre></div>
 </div>
 <div class="sect2">
@@ -1573,7 +1894,7 @@ distance.</p></div>
 <div class="content">
 <img src="images/Final-Graph-find-geometries-within--distance.svg" alt="Final-Graph-find-geometries-within--distance.svg">
 </div>
-<div class="title">Figure 7. Final Graph</div>
+<div class="title">Figure 11. Final Graph</div>
 </div>
 <div class="paragraph"><p><em>Example request</em></p></div>
 <div class="ulist"><ul>
@@ -1584,7 +1905,7 @@ distance.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1609,32 +1930,33 @@ distance.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">[ {
-  "paged_traverse" : "http://localhost:7575/db/data/node/15/paged/traverse/{returnType}{?pageSize,leaseTime}",
-  "outgoing_relationships" : "http://localhost:7575/db/data/node/15/relationships/out",
+  "labels" : "http://localhost:7575/db/data/node/27/labels",
+  "outgoing_relationships" : "http://localhost:7575/db/data/node/27/relationships/out",
   "data" : {
     "lon" : 15.2,
     "bbox" : [ 15.2, 60.1, 15.2, 60.1 ],
-    "lat" : 60.1,
-    "gtype" : 1
+    "gtype" : 1,
+    "lat" : 60.1
   },
-  "all_typed_relationships" : "http://localhost:7575/db/data/node/15/relationships/all/{-list|&amp;|types}",
-  "traverse" : "http://localhost:7575/db/data/node/15/traverse/{returnType}",
-  "self" : "http://localhost:7575/db/data/node/15",
-  "all_relationships" : "http://localhost:7575/db/data/node/15/relationships/all",
-  "property" : "http://localhost:7575/db/data/node/15/properties/{key}",
-  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/15/relationships/out/{-list|&amp;|types}",
-  "properties" : "http://localhost:7575/db/data/node/15/properties",
-  "incoming_relationships" : "http://localhost:7575/db/data/node/15/relationships/in",
-  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/15/relationships/in/{-list|&amp;|types}",
+  "traverse" : "http://localhost:7575/db/data/node/27/traverse/{returnType}",
+  "all_typed_relationships" : "http://localhost:7575/db/data/node/27/relationships/all/{-list|&amp;|types}",
+  "property" : "http://localhost:7575/db/data/node/27/properties/{key}",
+  "self" : "http://localhost:7575/db/data/node/27",
+  "properties" : "http://localhost:7575/db/data/node/27/properties",
+  "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/27/relationships/out/{-list|&amp;|types}",
+  "incoming_relationships" : "http://localhost:7575/db/data/node/27/relationships/in",
   "extensions" : {
   },
-  "create_relationship" : "http://localhost:7575/db/data/node/15/relationships"
+  "create_relationship" : "http://localhost:7575/db/data/node/27/relationships",
+  "paged_traverse" : "http://localhost:7575/db/data/node/27/paged/traverse/{returnType}{?pageSize,leaseTime}",
+  "all_relationships" : "http://localhost:7575/db/data/node/27/relationships/all",
+  "incoming_typed_relationships" : "http://localhost:7575/db/data/node/27/relationships/in/{-list|&amp;|types}"
 } ]</pre></div>
 </div>
 <div class="sect2">
@@ -1645,7 +1967,7 @@ box.</p></div>
 <div class="content">
 <img src="images/Final-Graph-find-geometries-in-a-bounding-box-using-cypher.svg" alt="Final-Graph-find-geometries-in-a-bounding-box-using-cypher.svg">
 </div>
-<div class="title">Figure 8. Final Graph</div>
+<div class="title">Figure 12. Final Graph</div>
 </div>
 <div class="paragraph"><p><em>Example request</em></p></div>
 <div class="ulist"><ul>
@@ -1656,7 +1978,7 @@ box.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1678,14 +2000,34 @@ box.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">{
   "columns" : [ "node" ],
-  "data" : [ ]
+  "data" : [ [ {
+    "labels" : "http://localhost:7575/db/data/node/10/labels",
+    "outgoing_relationships" : "http://localhost:7575/db/data/node/10/relationships/out",
+    "data" : {
+      "lon" : 15.2,
+      "lat" : 60.1
+    },
+    "traverse" : "http://localhost:7575/db/data/node/10/traverse/{returnType}",
+    "all_typed_relationships" : "http://localhost:7575/db/data/node/10/relationships/all/{-list|&amp;|types}",
+    "property" : "http://localhost:7575/db/data/node/10/properties/{key}",
+    "self" : "http://localhost:7575/db/data/node/10",
+    "properties" : "http://localhost:7575/db/data/node/10/properties",
+    "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/10/relationships/out/{-list|&amp;|types}",
+    "incoming_relationships" : "http://localhost:7575/db/data/node/10/relationships/in",
+    "extensions" : {
+    },
+    "create_relationship" : "http://localhost:7575/db/data/node/10/relationships",
+    "paged_traverse" : "http://localhost:7575/db/data/node/10/paged/traverse/{returnType}{?pageSize,leaseTime}",
+    "all_relationships" : "http://localhost:7575/db/data/node/10/relationships/all",
+    "incoming_typed_relationships" : "http://localhost:7575/db/data/node/10/relationships/in/{-list|&amp;|types}"
+  } ] ]
 }</pre></div>
 </div>
 <div class="sect2">
@@ -1696,7 +2038,7 @@ Cypher.</p></div>
 <div class="content">
 <img src="images/Final-Graph-find-geometries-within--distance-using-cypher.svg" alt="Final-Graph-find-geometries-within--distance-using-cypher.svg">
 </div>
-<div class="title">Figure 9. Final Graph</div>
+<div class="title">Figure 13. Final Graph</div>
 </div>
 <div class="paragraph"><p><em>Example request</em></p></div>
 <div class="ulist"><ul>
@@ -1707,7 +2049,7 @@ Cypher.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Accept:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 <li>
@@ -1718,7 +2060,7 @@ Cypher.</p></div>
 </ul></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">{
-  "query" : "start node = node:geom('withinDistance:[15.0,15.3,60.0,60.2, 5.0]') return node"
+  "query" : "start node = node:geom('withinDistance:[60.0,15.0, 100.0]') return node"
 }</pre></div>
 <div class="paragraph"><p><em>Example response</em></p></div>
 <div class="ulist"><ul>
@@ -1729,15 +2071,36 @@ Cypher.</p></div>
 </li>
 <li>
 <p>
-<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json</span>
+<strong><span class="monospaced">Content-Type:</span></strong> <span class="monospaced">application/json; charset=UTF-8</span>
 </p>
 </li>
 </ul></div>
 <div class="listingblock">
 <pre class="programlisting brush: javascript">{
   "columns" : [ "node" ],
-  "data" : [ ]
+  "data" : [ [ {
+    "labels" : "http://localhost:7575/db/data/node/21/labels",
+    "outgoing_relationships" : "http://localhost:7575/db/data/node/21/relationships/out",
+    "data" : {
+      "lon" : 15.2,
+      "lat" : 60.1
+    },
+    "traverse" : "http://localhost:7575/db/data/node/21/traverse/{returnType}",
+    "all_typed_relationships" : "http://localhost:7575/db/data/node/21/relationships/all/{-list|&amp;|types}",
+    "property" : "http://localhost:7575/db/data/node/21/properties/{key}",
+    "self" : "http://localhost:7575/db/data/node/21",
+    "properties" : "http://localhost:7575/db/data/node/21/properties",
+    "outgoing_typed_relationships" : "http://localhost:7575/db/data/node/21/relationships/out/{-list|&amp;|types}",
+    "incoming_relationships" : "http://localhost:7575/db/data/node/21/relationships/in",
+    "extensions" : {
+    },
+    "create_relationship" : "http://localhost:7575/db/data/node/21/relationships",
+    "paged_traverse" : "http://localhost:7575/db/data/node/21/paged/traverse/{returnType}{?pageSize,leaseTime}",
+    "all_relationships" : "http://localhost:7575/db/data/node/21/relationships/all",
+    "incoming_typed_relationships" : "http://localhost:7575/db/data/node/21/relationships/in/{-list|&amp;|types}"
+  } ] ]
 }</pre></div>
+<div class="paragraph"><p>include::dev/rest-api/find-geometries-close-to-a-point.asciidoc</p></div>
 </div>
 </div>
 </div>
@@ -1894,7 +2257,7 @@ Refer to the unit tests in classes <span class="monospaced">TestDynamicLayers</s
 <div class="listingblock"><div class="content">
 <pre class="programlisting brush: java">OSMImporter importer = new OSMImporter("map.osm");
 importer.setCharset(Charset.forName("UTF-8"));
-BatchInserter batchInserter = new BatchInserterImpl(databasePath);
+BatchInserter batchInserter = BatchInserters.inserter(databasePath);
 importer.importFile(batchInserter, "map.osm", false);
 batchInserter.shutdown();
 
@@ -1916,11 +2279,14 @@ try {
     System.out.println("Have " + spatialIndex.count() + " geometries in " + spatialIndex.getBoundingBox());
 
     Envelope bbox = new Envelope(12.94, 12.96, 56.04, 56.06);
-    List&lt;SpatialDatabaseRecord&gt; results = GeoPipeline
-        .startIntersectWindowSearch(layer, bbox)
-        .toSpatialDatabaseRecordList();
+    try (Transaction tx = database.beginTx()) {
+        List&lt;SpatialDatabaseRecord&gt; results = GeoPipeline
+            .startIntersectWindowSearch(layer, bbox)
+            .toSpatialDatabaseRecordList();
 
-    doGeometryTestsOnResults(bbox, results);
+        doGeometryTestsOnResults(bbox, results);
+        tx.success();
+    }
 } finally {
     database.shutdown();
 }</pre>
@@ -1933,10 +2299,13 @@ Also review the classes in the <span class="monospaced">org.neo4j.gis.spatial.qu
 <div class="paragraph"><p>The ESRI Shapefile that we imported in the first example above was actually created by Neo4j-Spatial. It is possible to use the results of a query, or a DynamicLayer, to create a new Shapefile using the ShapefileExporter. If we were to export the complete layer created from importing a shapefile, we would not achieve much, but we can could use this capability to create shapefiles that are subsets of other layers, or that are created from data in another format.</p></div>
 <div class="listingblock"><div class="content">
 <pre class="programlisting brush: java">SpatialDatabaseService spatialService = new SpatialDatabaseService(database);
-OSMLayer layer = (OSMLayer) spatialService.getLayer("map.osm");
-DynamicLayerConfig wayLayer = layer.addSimpleDynamicLayer(Constants.GTYPE_LINESTRING);
-ShapefileExporter shpExporter = new ShapefileExporter(database);
-shpExporter.exportLayer(wayLayer.getName());</pre>
+try (Transaction tx = database.beginTx()) {
+    OSMLayer layer = (OSMLayer) spatialService.getLayer("map.osm");
+    DynamicLayerConfig wayLayer = layer.addSimpleDynamicLayer(Constants.GTYPE_LINESTRING);
+    ShapefileExporter shpExporter = new ShapefileExporter(database);
+    shpExporter.exportLayer(wayLayer.getName());
+    tx.success();
+}</pre>
 </div></div>
 <div class="paragraph"><p>This example shows how we can import an OSM dataset, which contains data with a number of different Geometry types, and then by using a DynamicLayer to select for only geometries of type <em>LineString</em>, we can export all the OSM ways to a Shapefile. This is particularly important when you consider that ESRI Shapefile format does not allow more than one Geometry type per shapefile.</p></div>
 <div class="listingblock"><div class="content">
@@ -1946,13 +2315,15 @@ LayerIndexReader spatialIndex = layer.getIndex();
 System.out.println("Have " + spatialIndex.count() + " geometries in " + spatialIndex.getBoundingBox());
 
 Envelope bbox = new Envelope(12.94, 12.96, 56.04, 56.06);
-List&lt;SpatialDatabaseRecord&gt; results = GeoPipeline
-    .startIntersectWindowSearch(layer, bbox)
-    .toSpatialDatabaseRecordList();
+try (Transaction tx = database.beginTx()) {
+    List&lt;SpatialDatabaseRecord&gt; results = GeoPipeline
+        .startIntersectWindowSearch(layer, bbox)
+        .toSpatialDatabaseRecordList();
 
-spatialService.createResultsLayer("results", results);
-ShapefileExporter shpExporter = new ShapefileExporter(database);
-shpExporter.exportLayer("results");</pre>
+    spatialService.createResultsLayer("results", results);
+    ShapefileExporter shpExporter = new ShapefileExporter(database);
+    shpExporter.exportLayer("results");
+    tx.success();</pre>
 </div></div>
 <div class="paragraph"><p>This time we import the same OSM model, but query for all geometries inside a envelope, and export that to a new Shapefile.</p></div>
 </div>
@@ -2354,7 +2725,7 @@ GeoPipeline pipeline = OSMGeoPipeline.startOsm( osmLayer )
 <div id="footnotes"><hr></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2013-06-19 20:55:31 CEST
+Last updated 2013-11-15 14:25:51 CET
 </div>
 </div>
 </body>
