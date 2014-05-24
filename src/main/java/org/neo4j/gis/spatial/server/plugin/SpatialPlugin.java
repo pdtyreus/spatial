@@ -110,6 +110,29 @@ public class SpatialPlugin extends ServerPlugin {
             tx.close();
         }
     }
+    
+    @PluginTarget(GraphDatabaseService.class)
+    @Description("delete a geometry node from a layer.")
+    public Iterable<Node> deleteNodeFromLayer(@Source GraphDatabaseService db,
+                                         @Description("The node representing a geometry to delete from the layer") @Parameter(name = "node") Node node,
+                                         @Description("The layer to delete the node from.") @Parameter(name = "layer") String layer) {
+        SpatialDatabaseService spatialService = getSpatialDatabaseService(db);
+//        System.out.println("adding node " + node + " to layer '" + layer + "'");
+
+        EditableLayer spatialLayer = (EditableLayer) spatialService.getLayer(layer);
+        Transaction tx = db.beginTx();
+        try {
+            spatialLayer.delete(node.getId());
+            tx.success();
+            return null;
+        } catch (Exception e) {
+            tx.failure();
+            e.printStackTrace();
+            throw new RuntimeException("Error removing nodes from layer "+layer,e);
+        } finally {
+            tx.close();
+        }
+    }
 
     @PluginTarget(GraphDatabaseService.class)
     @Description("adds many geometry nodes (about 10k-50k) to a layer, as long as the nodes contain the geometry information appropriate to this layer.")

@@ -141,6 +141,8 @@ public class SpatialPluginFunctionalTest extends AbstractRestFunctionalTestBase
     {
         data.get();
         String response = post(Status.OK,"{\"layer\":\"geom\", \"lat\":\"lat\", \"lon\":\"lon\"}", ENDPOINT + "/graphdb/addSimplePointLayer");
+        response = post(Status.OK,"{\"layer\":\"geom\"}", ENDPOINT+ "/graphdb/getLayer");
+        assertTrue(response.contains("geom"));
     }
 
     /**
@@ -200,6 +202,27 @@ public class SpatialPluginFunctionalTest extends AbstractRestFunctionalTestBase
         response = post(Status.CREATED,"{\"lat\":60.1, \"lon\":15.2}", "http://localhost:"+PORT+"/db/data/node");
         int nodeId = getNodeId(response);
         response = post(Status.OK,"{\"layer\":\"geom\", \"node\":\"http://localhost:"+PORT+"/db/data/node/"+nodeId+"\"}", ENDPOINT + "/graphdb/addNodeToLayer");
+    }
+    
+    /**
+     * Add the node we created to the spatial 
+     * index.
+     */
+    @Test
+    @Documented
+    public void delete_a_node_to_the_spatial_index() throws Exception {
+        data.get();
+        String response = post(Status.OK,"{\"layer\":\"geom\", \"lat\":\"lat\", \"lon\":\"lon\"}", ENDPOINT + "/graphdb/addSimplePointLayer");
+        response = post(Status.CREATED,"{\"name\":\"geom\", \"config\":{\"provider\":\"spatial\", \"geometry_type\":\"point\",\"lat\":\"lat\",\"lon\":\"lon\"}}", "http://localhost:"+PORT+"/db/data/index/node/");
+        response = post(Status.CREATED,"{\"lat\":60.1, \"lon\":15.2}", "http://localhost:"+PORT+"/db/data/node");
+        int nodeId = getNodeId(response);
+        response = post(Status.OK,"{\"layer\":\"geom\", \"node\":\"http://localhost:"+PORT+"/db/data/node/"+nodeId+"\"}", ENDPOINT + "/graphdb/addNodeToLayer");
+        
+        assertTrue(findNodeInBox("geom",15.0, 15.3, 60.0, 61.0).contains("60.1"));
+        
+        response = post(Status.NO_CONTENT,"{\"layer\":\"geom\", \"node\":\"http://localhost:"+PORT+"/db/data/node/"+nodeId+"\"}", ENDPOINT + "/graphdb/deleteNodeFromLayer");
+        
+        assertFalse(findNodeInBox("geom",15.0, 15.3, 60.0, 61.0).contains("60.1"));
     }
 
     /**
