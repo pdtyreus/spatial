@@ -100,7 +100,7 @@ public class SpatialPluginFunctionalTest extends AbstractRestFunctionalTestBase
     }
 
     /**
-     * This allows cypher querying a bounding box
+     * This does not yet allow cypher querying a bounding box
      */
     @Test
     @Documented
@@ -120,6 +120,30 @@ public class SpatialPluginFunctionalTest extends AbstractRestFunctionalTestBase
         assertFalse(response.contains("60.1"));
         response = post(Status.OK,"{\"query\":\"start node = node:geom(\'withinDistance:[15.0,60.0, 100.0]\') return node\"}", "http://localhost:"+PORT+"/db/data/cypher");
         assertFalse(response.contains( "60.1" ));
+
+    }
+    
+    /**
+     * This allows cypher querying a bounding box
+     */
+    @Test
+    @Documented
+    public void querying_with_cypher_without_layer() throws UnsupportedEncodingException, ParseException {
+        data.get();
+        String response = post(Status.OK,"{\"layer\":\"geom\", \"lat\":\"lat\", \"lon\":\"lon\"}", ENDPOINT + "/graphdb/addSimplePointLayer");
+        response = post(Status.CREATED,"{\"lat\":60.1, \"lon\":15.2}", "http://localhost:"+PORT+"/db/data/node");
+        int nodeId = getNodeId(response);
+        response = post(Status.CREATED,"{\"name\":\"geom\", \"config\":{\"provider\":\"spatial\", \"geometry_type\":\"point\",\"lat\":\"lat\",\"lon\":\"lon\"}}", "http://localhost:"+PORT+"/db/data/index/node/");
+        response = post(Status.CREATED,"{\"key\":\"k\", \"value\":\"v\", \"uri\":\"http://localhost:"+PORT+"/db/data/node/"+nodeId+"\"}", "http://localhost:"+PORT+"/db/data/index/node/geom");
+        response = post(Status.OK,"{\"layer\":\"geom\", \"minx\":15.0,\"maxx\":15.3,\"miny\":60.0,\"maxy\":60.2}", ENDPOINT + "/graphdb/findGeometriesInBBox");
+        assertTrue(response.contains( "60.1" ));
+        response = post(Status.OK,"{\"layer\":\"geom\", \"pointX\":15.0,\"pointY\":60.0,\"distanceInKm\":100}", ENDPOINT + "/graphdb/findGeometriesWithinDistance");
+        assertTrue(response.contains( "60.1" ));
+        response = post(Status.OK,"{\"query\":\"start node = node:geom(\'bbox:[15.0,15.3,60.0,60.2]\') return node\"}", "http://localhost:"+PORT+"/db/data/cypher");
+        assertTrue(response.contains("60.1"));
+        //note latitude and longitude order appear reversed...
+        response = post(Status.OK,"{\"query\":\"start node = node:geom(\'withinDistance:[60.0,15.0, 100.0]\') return node\"}", "http://localhost:"+PORT+"/db/data/cypher");
+        assertTrue(response.contains( "60.1" ));
 
     }
 
